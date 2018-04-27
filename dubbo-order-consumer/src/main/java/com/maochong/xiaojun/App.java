@@ -1,13 +1,15 @@
 package com.maochong.xiaojun;
 
+
+import com.alibaba.dubbo.container.Main;
+
 /**
- * Hello world!
- *
+ * 作为服务提供者启动
  */
 public class App 
 {
     public static void main( String[] args )
     {
-        System.out.println( "Hello World!" );
+        Main.main(args);
     }
 }
