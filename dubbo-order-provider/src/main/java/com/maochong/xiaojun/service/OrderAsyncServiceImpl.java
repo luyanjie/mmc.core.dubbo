@@ -5,23 +5,23 @@ import com.maochong.xiaojun.orderapi.DoOrderResponse;
 import com.maochong.xiaojun.orderapi.IOrderServices;
 
 /**
- * 多版本中的1.0.0版本
+ * 区分服务消费者异步调用的返回内容，单独添加一个实现类
  * @author jokin
- * @date 2018-04-15
+ * @date 2018-05-04
  * */
-public class OrderServiceImpl implements IOrderServices {
+public class OrderAsyncServiceImpl implements IOrderServices {
     @Override
     public DoOrderResponse doOrder(DoOrderRequest request) {
         DoOrderResponse response = new DoOrderResponse();
         if(request!=null){
-            System.out.println("版本1.0.0"+request.toString());
+            System.out.println("异步调用版本2.2.0"+request.toString());
             response.setCode(200);
-            response.setMessage("success");
+            response.setMessage("2.2.0 success");
             response.setOrderId(request.getOrderId());
             return response;
         }
         response.setOrderId("");
-        response.setMessage("fail");
+        response.setMessage("2.2.0 fail");
         response.setCode(404);
         return response;
     }

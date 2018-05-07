@@ -16,6 +16,8 @@
     <!--当前服务发布所依赖的协议；webserovice、Thrift、Hessain、http-->
     <dubbo:protocol name="dubbo" port="20881"></dubbo:protocol>
 
+
+
     <!--服务发布配置，需要暴露的服务接口-->
     <dubbo:service interface="com.maochong.xiaojun.userapi.IUserService" ref="userService" timeout="5000"></dubbo:service>
 
