@@ -3,12 +3,14 @@ package com.maochong.xiaojun.service;
 import com.maochong.xiaojun.orderapi.DoOrderRequest;
 import com.maochong.xiaojun.orderapi.DoOrderResponse;
 import com.maochong.xiaojun.orderapi.IOrderServices;
+import org.springframework.stereotype.Service;
 
 /**
  * 多版本中的2.0.0版本
  * @author jokin
  * @date 2018-05-04
  * */
+@Service("orderQueryService")
 public class OrderQueryServiceImpl implements IOrderServices {
     @Override
     public DoOrderResponse doOrder(DoOrderRequest request) {

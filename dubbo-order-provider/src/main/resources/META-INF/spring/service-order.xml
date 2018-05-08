@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://code.alibabatech.com/schema/dubbo
+        http://code.alibabatech.com/schema/dubbo/dubbo.xsd" default-autowire="byName">
+
+
+    <!--服务发布的配置，需要暴露的服务接口-->
+    <dubbo:service interface="com.maochong.xiaojun.orderapi.IOrderServices" ref="orderService" protocol="dubbo" timeout="5000"  version="1.0.0" loadbalance="random" weight="100"/>
+
+    <dubbo:service interface="com.maochong.xiaojun.orderapi.IOrderServices" ref="orderQueryService" protocol="dubbo" timeout="5000"  version="2.0.0"/>
+
+    <dubbo:service interface="com.maochong.xiaojun.orderapi.IOrderServices" ref="orderAsyncService" protocol="dubbo" timeout="5000"  version="2.2.0"/>
+</beans>

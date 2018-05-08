@@ -66,14 +66,14 @@ public class AppLication {
         System.out.println("======版本2.0.0===========");
         IOrderServices services = (IOrderServices)context.getBean("orderQueryServices");
 
-        try {
-            System.out.println("开始等待..........");
-            // 这个时候如果注册中心挂了，如果有把注册服务写到本地，依然可以使用
-            //
-            TimeUnit.SECONDS.sleep(20);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            System.out.println("开始等待..........");
+//            // 这个时候如果注册中心挂了，如果有把注册服务写到本地，依然可以使用
+//            //
+//            TimeUnit.SECONDS.sleep(20);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
 
         DoOrderResponse response = services.doOrder(request);
 
