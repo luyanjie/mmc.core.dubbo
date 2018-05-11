@@ -12,6 +12,7 @@
 
     <context:property-placeholder location="classpath:application.properties" />
 
+    <context:component-scan base-package="com.maochong.xiaojun.dao"/>
     <context:component-scan base-package="com.maochong.xiaojun.service"/>
 
     <context:annotation-config/>

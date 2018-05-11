@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.maochong.xiaojun.OrderMapper">
+
+    <sql id="order">`order`</sql>
+    <!-- 结果集定义 -->
+    <resultMap id="orderMap" type="order">
+        <id column="id" property="id" />
+        <result column="date" property="date" />
+        <result column="orderId" property="orderId" />
+        <result column="uid" property="uid" />
+        <result column="message" property="message" />
+    </resultMap>
+
+    <sql id="base_column_list">
+        id,date,orderId,uid,message
+    </sql>
+
+
+
+    <select id="selectOne" parameterType="map" resultMap="orderMap">
+        SELECT
+        <include refid="base_column_list"/>
+        FROM
+        <include refid="order"></include>
+        <where>
+        <include refid="condition_sql" />
+        </where>
+        ORDER BY id DESC
+        <if test="rowNum != null">
+        LIMIT #{rowNum}
+        </if>
+    </select>
+
+    <!-- 新增操作 -->
+    <!--<insert id="insertUser" parameterType="user" useGeneratedKeys="true" keyProperty="id">-->
+        <!--INSERT INTO-->
+        <!--<include refid="user" />-->
+        <!--(USERNAME, PASSWORD, AGE)-->
+        <!--VALUES-->
+        <!--(#{username},#{password}, #{age})-->
+    <!--</insert>-->
+
+    <!-- 通过参数MAP获取会员附件信息对象列表 -->
+    <!--<select id="listBy" parameterType="map" resultMap="userMap">-->
+        <!--SELECT-->
+        <!--<include refid="base_column_list" />-->
+        <!--FROM-->
+        <!--<include refid="user" />-->
+        <!--<where>-->
+            <!--<include refid="condition_sql" />-->
+        <!--</where>-->
+        <!--ORDER BY id DESC-->
+        <!--<if test="rowNum != null">-->
+            <!--LIMIT #{rowNum}-->
+        <!--</if>-->
+    <!--</select>-->
+
+    <!-- 查询条件where语句块 -->
+    <sql id="condition_sql">
+        <if test="orderId != null">
+            AND orderId = #{orderId}
+        </if>
+        <if test="id != null">
+            AND id = #{id}
+        </if>
+    </sql>
+</mapper>

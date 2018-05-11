@@ -33,7 +33,7 @@ public class AppLication {
         /**
          * 版本2.2.0 异步调用测试
          * */
-        async(context,request);
+        //async(context,request);
 
         try {
             System.in.read();
