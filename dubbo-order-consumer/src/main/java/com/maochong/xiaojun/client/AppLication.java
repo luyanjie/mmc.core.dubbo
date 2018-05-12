@@ -28,7 +28,7 @@ public class AppLication {
         /**
          * 版本2.0.0
          * */
-        v2(context,request);
+        // v2(context,request);
 
         /**
          * 版本2.2.0 异步调用测试
