@@ -12,6 +12,7 @@
     <module>dubbo-order-api</module>
     <module>dubbo-order-provider</module>
     <module>dubbo-order-consumer</module>
+    <module>vip-io</module>
   </modules>
 
   <name>mmc-core-dubbo</name>
