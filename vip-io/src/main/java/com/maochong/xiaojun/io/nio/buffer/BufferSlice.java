@@ -3,7 +3,7 @@ package com.maochong.xiaojun.io.nio.buffer;
 import java.nio.ByteBuffer;
 
 /**
- * 缓冲区片（子缓冲区）
+ * 缓冲区片（子缓冲区）缓冲区分片
  * */
 public class BufferSlice {
 
@@ -14,7 +14,6 @@ public class BufferSlice {
         for (int i=0; i<buffer.capacity(); ++i) {
             buffer.put( (byte)i );
         }
-
         // 创建子缓冲区
         buffer.position(3);
         buffer.limit(7);

@@ -5,7 +5,8 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
 /**
- * 创建文件，把内容回写到创建的文件中
+ * 直接缓冲区（实现零拷贝）
+ * @author jokin
  * */
 public class DirectBuffer {
     public static void main(String[] args) throws IOException {

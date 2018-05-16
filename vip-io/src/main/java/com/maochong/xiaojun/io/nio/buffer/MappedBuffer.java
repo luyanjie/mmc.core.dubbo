@@ -7,7 +7,7 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 
 /**
- * 把缓冲区跟文件系统进行一个映射关联 (操作缓冲区联通操作文件)
+ * 把缓冲区跟文件系统进行一个映射关联 (操作缓冲区->操作文件)
  * */
 public class MappedBuffer {
     static private final int start = 0;

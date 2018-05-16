@@ -12,8 +12,12 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * cache测试
+ * @author jokin
+ * 这里使用dubbo远程方法调用服务，所以不能配置在dubbo直接的方法入口类上，因为会生成代理类，导致无法获取到@Cacheable 等注解
+ * */
 @Service
-@EnableCaching
 public class CacheTest {
 
     private Logger logger = LoggerFactory.getLogger(CacheTest.class);

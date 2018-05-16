@@ -2,6 +2,10 @@ package com.maochong.xiaojun.io.nio.buffer;
 
 import java.nio.ByteBuffer;
 
+/**
+ * 只读缓冲区
+ * @author jokin
+ * */
 public class ReadOnlyBuffer {
     public static void main(String[] args) {
         ByteBuffer buffer = ByteBuffer.allocate(10);

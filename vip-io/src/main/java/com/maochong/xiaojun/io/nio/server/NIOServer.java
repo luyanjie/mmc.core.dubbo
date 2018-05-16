@@ -16,7 +16,7 @@ import java.util.Set;
  * */
 public class NIOServer {
     private Charset charset = Charset.forName("UTF-8");
-    //用来记录在线人数，以及昵称（类似注册中心，应该可以用zookeeper来做）
+    // 用来记录在线人数，以及昵称（类似注册中心，应该可以用zookeeper来做）
     private static HashSet<String> users = new HashSet<>();
 
     private static String USER_EXIST = "系统提示：该昵称已经存在，请换一个昵称";
@@ -77,7 +77,7 @@ public class NIOServer {
         if(key.isAcceptable()){
             ServerSocketChannel server = (ServerSocketChannel)key.channel();
             SocketChannel client = server.accept();
-            //非阻塞模式
+            //非阻塞模式（为了向下兼容：兼容BIO，所以默认是用了阻塞IO）
             client.configureBlocking(false);
             //注册选择器，并设置为读取模式，收到一个连接请求，然后起一个SocketChannel，并注册到selector上，之后这个连接的数据，就由这个SocketChannel处理
             client.register(selector, SelectionKey.OP_READ);

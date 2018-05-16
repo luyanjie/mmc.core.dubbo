@@ -13,6 +13,7 @@
     <module>dubbo-order-provider</module>
     <module>dubbo-order-consumer</module>
     <module>vip-io</module>
+      <module>vip-netty-chat</module>
   </modules>
 
   <name>mmc-core-dubbo</name>
@@ -138,11 +139,25 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-core</artifactId>
+      <version>1.2.3</version>
+    </dependency>
+    <dependency>
       <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
+      <artifactId>slf4j-api</artifactId>
       <version>1.7.25</version>
     </dependency>
-
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <version>1.7.25</version>
+    </dependency>
+    <dependency>
+      <groupId>org.logback-extensions</groupId>
+      <artifactId>logback-ext-spring</artifactId>
+      <version>0.1.1</version>
+    </dependency>
     <!--cache-->
     <dependency>
       <groupId>com.googlecode.ehcache-spring-annotations</groupId>
@@ -160,7 +175,21 @@
       <artifactId>dubbo-order-api</artifactId>
       <version>1.0-SNAPSHOT</version>
     </dependency>
+    <!--fastjson依赖-->
+    <dependency>
+      <groupId>com.alibaba</groupId>
+      <artifactId>fastjson</artifactId>
+      <version>1.2.31</version>
+    </dependency>
+    <!--lombok依赖-->
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>1.16.20</version>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
+
 </dependencyManagement>
 
 </project>

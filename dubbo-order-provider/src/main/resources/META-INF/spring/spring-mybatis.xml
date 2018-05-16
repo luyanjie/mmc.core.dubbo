@@ -78,28 +78,5 @@
     </bean>
     <!--<import resource="classpath:spring/dubbo-service.xml"/>-->
 
-    <!-- 缓存配置 -->
-    <!-- 启用缓存注解功能(请将其配置在Spring主配置文件中) -->
-    <cache:annotation-driven cache-manager="cacheManager"/>
-    <!-- Spring自带的Cache!!! Spring自己的基于java.util.concurrent.ConcurrentHashMap实现的缓存管理器(该功能是从Spring3.1开始提供的) -->
-    <!--
-    <bean id="cacheManager" class="org.springframework.cache.support.SimpleCacheManager">
-        <property name="caches">
-            <set>
-                <bean name="movieFindCache" class="org.springframework.cache.concurrent.ConcurrentMapCacheFactoryBean"/>  //对应@Cacheable(value="movieFindCache"
-            </set>
-        </property>
-    </bean>
-     -->
-    <!-- 若只想使用Spring自身提供的缓存器,则注释掉下面的两个关于Ehcache配置的bean,并启用上面的SimpleCacheManager即可 -->
-    <!-- Spring提供的基于的Ehcache实现的缓存管理器 -->
-    <bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheCacheManager">
-        <property name="cacheManager" ref="cacheManagerFactory"/>
-    </bean>
-
-    <bean id="cacheManagerFactory" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
-        <property name="configLocation" value="classpath:config/ehcache.xml"/>
-        <property name="shared" value="true"/>
-    </bean>
-
+    <!--cache配置移植到代码中直接配置-->
 </beans>

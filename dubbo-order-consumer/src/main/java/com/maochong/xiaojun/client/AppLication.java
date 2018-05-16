@@ -11,8 +11,12 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * dubbo客户端调用
+ * @author jokin
+ * */
 public class AppLication {
-    public static void main( String[] args ) {
+    public static void main( String[] args ) throws InterruptedException {
         ClassPathXmlApplicationContext context =  new ClassPathXmlApplicationContext("order-consumer.xml");
         // 用户下单
         DoOrderRequest request = new DoOrderRequest();
@@ -25,6 +29,8 @@ public class AppLication {
          * */
         v1(context,request);
 
+
+
         /**
          * 版本2.0.0
          * */
@@ -36,6 +42,7 @@ public class AppLication {
         //async(context,request);
 
         try {
+            TimeUnit.SECONDS.sleep(1);
             System.in.read();
         } catch (IOException e) {
             e.printStackTrace();
@@ -49,14 +56,24 @@ public class AppLication {
     {
         System.out.println("======版本1.0.0===========");
         IOrderServices services = (IOrderServices)context.getBean("orderServices");
-        DoOrderResponse response = services.doOrder(request);
 
-        if(response!=null){
-            System.out.println("版本1.0.0"+response.toString()+"message:"+ response.getMessage()+"code : " + response.getCode());
+        for (int i=1;i<100;i++)
+        {
+            DoOrderResponse response = services.doOrder(request);
+
+            if(response!=null){
+                System.out.println("版本1.0.0"+response.toString()+"message:"+ response.getMessage()+"code : " + response.getCode());
+            }
+            else {
+                System.out.println("版本1.0.0 请求返回null");
+            }
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
-        else {
-            System.out.println("版本1.0.0 请求返回null");
-        }
+
     }
 
     /**
