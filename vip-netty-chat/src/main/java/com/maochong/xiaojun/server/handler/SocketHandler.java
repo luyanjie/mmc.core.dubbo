@@ -11,13 +11,15 @@ import org.apache.log4j.Logger;
  * SocketHandler
  * @author jokin
  * */
-public class SocketHandler extends SimpleChannelInboundHandler<IMMessage> {
+public class SocketHandler extends SimpleChannelInboundHandler<IMMessage>{
+
     private static Logger LOG = Logger.getLogger(SocketHandler.class);
 
+    private MsgProcessor processor = new MsgProcessor();
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, IMMessage msg) throws Exception {
-        MsgProcessor.sendMessage(ctx.channel(), msg);
+        processor.sendMsg(ctx.channel(), msg);
     }
 
     @Override
@@ -29,8 +31,8 @@ public class SocketHandler extends SimpleChannelInboundHandler<IMMessage> {
     @Override
     public void handlerRemoved(ChannelHandlerContext ctx) throws Exception { // (3)
         Channel client = ctx.channel();
-        MsgProcessor.logout(client);
-        LOG.info("Socket Client:" + MsgProcessor.getNickName(client) + "离开");
+        processor.logout(client);
+        LOG.info("Socket Client:" + processor.getNickName(client) + "离开");
     }
 
     @Override
@@ -43,7 +45,7 @@ public class SocketHandler extends SimpleChannelInboundHandler<IMMessage> {
      */
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        LOG.info("Socket Client: 有客户端连接："+ MsgProcessor.getAddress(ctx.channel()));
+        LOG.info("Socket Client: 有客户端连接："+ processor.getAddress(ctx.channel()));
     }
 
 
@@ -56,4 +58,5 @@ public class SocketHandler extends SimpleChannelInboundHandler<IMMessage> {
         cause.printStackTrace();
         ctx.close();
     }
+
 }

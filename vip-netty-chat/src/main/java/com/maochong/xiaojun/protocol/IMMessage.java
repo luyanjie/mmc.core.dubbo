@@ -41,6 +41,8 @@ public class IMMessage {
      * */
     private String content;
 
+    public IMMessage(){}
+
     public IMMessage(String cmd,long time,int online,String content){
         this.cmd = cmd;
         this.time = time;

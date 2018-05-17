@@ -27,29 +27,37 @@ public class MsgProcessor {
      * IP_ADDR：IP地址
      * ATTS:扩展属性
      * */
-    private final static AttributeKey<String> NICK_NAME = AttributeKey.valueOf("nickName");
-    private final static AttributeKey<String> IP_ADDR = AttributeKey.valueOf("ipAddr");
-    private final static AttributeKey<JSONObject> ATTRS = AttributeKey.valueOf("attrs");
+    private final AttributeKey<String> NICK_NAME = AttributeKey.valueOf("nickName");
+    private final AttributeKey<String> IP_ADDR = AttributeKey.valueOf("ipAddr");
+    private final AttributeKey<JSONObject> ATTRS = AttributeKey.valueOf("attrs");
+
+    private IMDecoder decoder = new IMDecoder();
+    private IMEncoder encoder = new IMEncoder();
+
 
     /**
-     * 获取昵称
-     * */
-    public static String getNickName(Channel client){
+     * 获取用户昵称
+     * @param client
+     * @return
+     */
+    public String getNickName(Channel client){
         return client.attr(NICK_NAME).get();
     }
-
     /**
-     * 获取远程地址IP
-     * */
-    public static String getAddress(Channel client){
+     * 获取用户远程IP地址
+     * @param client
+     * @return
+     */
+    public String getAddress(Channel client){
         return client.remoteAddress().toString().replaceFirst("/","");
     }
 
     /**
      * 获取扩展属性
-     * */
-    public static JSONObject getAttrs(Channel client)
-    {
+     * @param client
+     * @return
+     */
+    public JSONObject getAttrs(Channel client){
         try{
             return client.attr(ATTRS).get();
         }catch(Exception e){
@@ -58,14 +66,13 @@ public class MsgProcessor {
     }
 
     /**
-     * 设置扩展属性
+     * 获取扩展属性
      * @param client
      * @return
      */
-    private static void setAttrs(Channel client,String key,Object value){
+    private void setAttrs(Channel client,String key,Object value){
         try{
-            JSONObject json = getAttrs(client);
-            if(json==null) {return;}
+            JSONObject json = client.attr(ATTRS).get();
             json.put(key, value);
             client.attr(ATTRS).set(json);
         }catch(Exception e){
@@ -79,12 +86,12 @@ public class MsgProcessor {
      * 登出通知
      * @param client
      */
-    public static void logout(Channel client){
+    public void logout(Channel client){
         //如果nickName为null，没有遵从聊天协议的连接，表示未非法登录
         if(getNickName(client) == null){ return; }
         for (Channel channel : onlineUsers) {
-            IMMessage request = new IMMessage(IMP.SYSTEM.getName(), System.currentTimeMillis(), onlineUsers.size(), getNickName(client) + "离开");
-            String content = IMEncoder.encode(request);
+            IMMessage request = new IMMessage(IMP.SYSTEM.getName(), sysTime(), onlineUsers.size(), getNickName(client) + "离开");
+            String content = encoder.encode(request);
             channel.writeAndFlush(new TextWebSocketFrame(content));
         }
         onlineUsers.remove(client);
@@ -92,51 +99,52 @@ public class MsgProcessor {
 
     /**
      * 发送消息
-     * */
-
-    public static void sendMessage(Channel client,IMMessage message){
-        sendMessage(client,IMEncoder.encode(message));
+     * @param client
+     * @param msg
+     */
+    public void sendMsg(Channel client,IMMessage msg){
+        sendMsg(client,encoder.encode(msg));
     }
 
-    public static void sendMessage(Channel client,String message)
-    {
-        IMMessage request = IMDecoder.decode(message);
-        if(null == request) {return;}
-        // 获取IP地址
+    /**
+     * 发送消息
+     * @param client
+     * @param msg
+     */
+    public void sendMsg(Channel client,String msg){
+        IMMessage request = decoder.decode(msg);
+        if(null == request){ return; }
+
         String addr = getAddress(client);
 
-        // 判断是否为登陆
         if(request.getCmd().equals(IMP.LOGIN.getName())){
             client.attr(NICK_NAME).getAndSet(request.getSender());
             client.attr(IP_ADDR).getAndSet(addr);
-            // 登陆，添加一个在线人数
             onlineUsers.add(client);
-            // 分发消息
-            for (Channel channel : onlineUsers){
-                request = new IMMessage(IMP.SYSTEM.getName(), System.currentTimeMillis(), onlineUsers.size(),
-                        client != channel
-                                ?getNickName(client) + "加入"
-                                :"已与服务器建立连接！");
-                String content = IMEncoder.encode(request);
+
+            for (Channel channel : onlineUsers) {
+                if(channel != client){
+                    request = new IMMessage(IMP.SYSTEM.getName(), sysTime(), onlineUsers.size(), getNickName(client) + "加入");
+                }else{
+                    request = new IMMessage(IMP.SYSTEM.getName(), sysTime(), onlineUsers.size(), "已与服务器建立连接！");
+                }
+                String content = encoder.encode(request);
                 channel.writeAndFlush(new TextWebSocketFrame(content));
             }
-        }
-        // 判断为聊天
-        else if (request.getCmd().equals(IMP.CHAT.getName()))
-        {
-            for (Channel channel:onlineUsers)
-            {
-                request.setSender(channel == client?"you":getNickName(client));
-                request.setTime(System.currentTimeMillis());
-                String content = IMEncoder.encode(request);
+        }else if(request.getCmd().equals(IMP.CHAT.getName())){
+            for (Channel channel : onlineUsers) {
+                if (channel == client) {
+                    request.setSender("you");
+                }else{
+                    request.setSender(getNickName(client));
+                }
+                request.setTime(sysTime());
+                String content = encoder.encode(request);
                 channel.writeAndFlush(new TextWebSocketFrame(content));
             }
-        }
-        // 判断为送花
-        else if(request.getCmd().equals(IMP.FLOWER.getName()))
-        {
+        }else if(request.getCmd().equals(IMP.FLOWER.getName())){
             JSONObject attrs = getAttrs(client);
-            long currTime = System.currentTimeMillis();
+            long currTime = sysTime();
             if(null != attrs){
                 long lastTime = attrs.getLongValue("lastFlowerTime");
                 //60秒之内不允许重复刷鲜花
@@ -146,7 +154,7 @@ public class MsgProcessor {
                     request.setSender("you");
                     request.setCmd(IMP.SYSTEM.getName());
                     request.setContent("您送鲜花太频繁," + (secends - Math.round(sub / 1000)) + "秒后再试");
-                    String content = IMEncoder.encode(request);
+                    String content = encoder.encode(request);
                     client.writeAndFlush(new TextWebSocketFrame(content));
                     return;
                 }
@@ -162,11 +170,19 @@ public class MsgProcessor {
                     request.setSender(getNickName(client));
                     request.setContent(getNickName(client) + "送来一波鲜花雨");
                 }
-                request.setTime(System.currentTimeMillis());
+                request.setTime(sysTime());
 
-                String content = IMEncoder.encode(request);
+                String content = encoder.encode(request);
                 channel.writeAndFlush(new TextWebSocketFrame(content));
             }
         }
     }
-}
+
+    /**
+     * 获取系统时间
+     * @return
+     */
+    private Long sysTime(){
+        return System.currentTimeMillis();
+    }
+ }

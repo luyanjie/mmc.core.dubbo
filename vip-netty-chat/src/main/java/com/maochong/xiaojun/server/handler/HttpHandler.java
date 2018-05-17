@@ -13,76 +13,63 @@ import java.net.URL;
  * @author jokin
  * */
 public class HttpHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
-
     private static Logger LOG = Logger.getLogger(HttpHandler.class);
-    /**
-     * 获取class路径
-     * */
-    private URL baseURL = HttpHandler.class.getProtectionDomain().getCodeSource().getLocation();
-    /**
-     * 设置文件根目录
-     */
-    private final String WWWROOT = "webroot";
 
-    /**
-     * 获取文件
-     * */
-    private File getResource(String fileName) throws Exception
-    {
-        // 拼装文件路径
-        String path = baseURL.toURI() + WWWROOT + "/"+fileName;
-        path = !path.startsWith("file:")?path:path.substring(5);
-        path = path.replaceAll("//","/");
-        return  new File(path);
+    //获取class路径
+    private URL baseURL = HttpHandler.class.getProtectionDomain().getCodeSource().getLocation();
+    private final String webroot = "webroot";
+
+    private File getResource(String fileName) throws Exception{
+        String path = baseURL.toURI() + webroot + "/" + fileName;
+        path = !path.contains("file:") ? path : path.substring(5);
+        path = path.replaceAll("//", "/");
+        return new File(path);
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request) throws Exception {
-        String uri = request.uri().toLowerCase();
+    public void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request) throws Exception {
+        String uri = request.getUri();
+
         RandomAccessFile file = null;
-        try {
+        try{
             String page = uri.equals("/") ? "chat.html" : uri;
             file =	new RandomAccessFile(getResource(page), "r");
-        }
-        catch (Exception ex)
-        {
+        }catch(Exception e){
             ctx.fireChannelRead(request.retain());
             return;
         }
-        HttpResponse response = new DefaultFullHttpResponse(request.protocolVersion(), HttpResponseStatus.OK);
+
+        HttpResponse response = new DefaultHttpResponse(request.getProtocolVersion(), HttpResponseStatus.OK);
         String contextType = "text/html;";
         if(uri.endsWith(".css")){
             contextType = "text/css;";
-        }
-        else if(uri.endsWith(".js")){
+        }else if(uri.endsWith(".js")){
             contextType = "text/javascript;";
         }else if(uri.toLowerCase().matches("(jpg|png|gif)$")){
             String ext = uri.substring(uri.lastIndexOf("."));
             contextType = "image/" + ext;
         }
-        response.headers().set("Content-Type", contextType + "charset=utf-8;");
+        response.headers().set(HttpHeaders.Names.CONTENT_TYPE, contextType + "charset=utf-8;");
 
-        // 是否长连接
-        boolean keepAlive = HttpUtil.isKeepAlive(request);
-        if(keepAlive)
-        {
-            response.headers().set("Content-Length", file.length());
-            response.headers().set("Connection", "keep-alive");
+        boolean keepAlive = HttpHeaders.isKeepAlive(request);
+
+        if (keepAlive) {
+            response.headers().set(HttpHeaders.Names.CONTENT_LENGTH, file.length());
+            response.headers().set(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
         }
         ctx.write(response);
-        ctx.write(new DefaultFileRegion(file.getChannel(),0,file.length()));
 
-        if(!keepAlive)
-        {
-            ChannelFuture future = ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);
+        ctx.write(new DefaultFileRegion(file.getChannel(), 0, file.length()));
+//        ctx.write(new ChunkedNioFile(file.getChannel()));
+
+        ChannelFuture future = ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);
+        if (!keepAlive) {
             future.addListener(ChannelFutureListener.CLOSE);
         }
+
         file.close();
     }
 
-    /**
-     * 重写异常
-     * */
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
             throws Exception {
@@ -93,3 +80,4 @@ public class HttpHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
         ctx.close();
     }
 }
+

@@ -13,26 +13,23 @@ import javax.core.common.config.CustomConfig;
  * */
 public class IMEncoder extends MessageToByteEncoder<IMMessage> {
     @Override
-    protected void encode(ChannelHandlerContext ctx, IMMessage msg, ByteBuf out) throws Exception {
+    protected void encode(ChannelHandlerContext ctx, IMMessage msg, ByteBuf out)
+            throws Exception {
         out.writeBytes(new MessagePack().write(msg));
     }
 
-    /**
-     * 自定义encode方式
-     * */
-    public static String encode(IMMessage message){
-        if(null == message) {return "";}
-        // 拼接输出头
-        String prex = "[" + message.getCmd() + "]" + "[" + message.getTime() + "]";
-        if(IMP.LOGIN.getName().equals(message.getCmd()) ||
-                IMP.CHAT.getName().equals(message.getCmd()) ||
-                IMP.FLOWER.getName().equals(message.getCmd())){
-            prex += ("[" + message.getSender() + "]");
-        }else if(IMP.SYSTEM.getName().equals(message.getCmd())){
-            prex += ("[" + message.getOnline() + "]");
+    public String encode(IMMessage msg){
+        if(null == msg){ return ""; }
+        String prex = "[" + msg.getCmd() + "]" + "[" + msg.getTime() + "]";
+        if(IMP.LOGIN.getName().equals(msg.getCmd()) ||
+                IMP.CHAT.getName().equals(msg.getCmd()) ||
+                IMP.FLOWER.getName().equals(msg.getCmd())){
+            prex += ("[" + msg.getSender() + "]");
+        }else if(IMP.SYSTEM.getName().equals(msg.getCmd())){
+            prex += ("[" + msg.getOnline() + "]");
         }
-        if(!(null == message.getContent() || "".equals(message.getContent()))){
-            prex += (" - " + message.getContent());
+        if(!(null == msg.getContent() || "".equals(msg.getContent()))){
+            prex += (" - " + msg.getContent());
         }
         return prex;
     }
