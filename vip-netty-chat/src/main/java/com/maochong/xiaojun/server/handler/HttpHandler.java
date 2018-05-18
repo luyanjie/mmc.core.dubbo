@@ -15,12 +15,14 @@ import java.net.URL;
 public class HttpHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
     private static Logger LOG = Logger.getLogger(HttpHandler.class);
 
-    //获取class路径
+    /**
+     * 获取文件路径
+     * */
     private URL baseURL = HttpHandler.class.getProtectionDomain().getCodeSource().getLocation();
     private final String webroot = "webroot";
 
     private File getResource(String fileName) throws Exception{
-        String path = baseURL.toURI() + webroot + "/" + fileName;
+        String path = baseURL.toURI()+"/"+webroot + "/" + fileName;
         path = !path.contains("file:") ? path : path.substring(5);
         path = path.replaceAll("//", "/");
         return new File(path);
@@ -34,11 +36,11 @@ public class HttpHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
         try{
             String page = uri.equals("/") ? "chat.html" : uri;
             file =	new RandomAccessFile(getResource(page), "r");
+
         }catch(Exception e){
             ctx.fireChannelRead(request.retain());
             return;
         }
-
         HttpResponse response = new DefaultHttpResponse(request.getProtocolVersion(), HttpResponseStatus.OK);
         String contextType = "text/html;";
         if(uri.endsWith(".css")){
