@@ -16,32 +16,52 @@ public class HttpHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
     private static Logger LOG = Logger.getLogger(HttpHandler.class);
 
     /**
-     * 获取文件路径
+     * 获取类的文件路径
      * */
     private URL baseURL = HttpHandler.class.getProtectionDomain().getCodeSource().getLocation();
-    private final String webroot = "webroot";
+    /**
+     * 文件存放目录路径
+     * */
+    private final String WebRoot = "webroot";
 
     private File getResource(String fileName) throws Exception{
-        String path = baseURL.toURI()+"/"+webroot + "/" + fileName;
-        path = !path.contains("file:") ? path : path.substring(5);
-        path = path.replaceAll("//", "/");
+        // 拼装文件路径
+        String path = baseURL.toURI()+"/"+WebRoot + "/" + fileName;
+        path = !path.contains("file:") ? path : path.substring(5).replaceAll("//", "/");
         return new File(path);
+
+        /**
+         * 获取路径的方式
+         * 第一种：获取类加载的根路径   D:\git\daotie\daotie\target\classes
+         *      File f = new File(this.getClass().getResource("/").getPath());
+         *       获取当前类的所在工程路径; 如果不加“/”  获取当前类的加载目录  D:\git\daotie\daotie\target\classes\my
+         *      File f2 = new File(this.getClass().getResource("").getPath());
+         * 第二种：获取项目路径    D:\git\daotie\daotie
+         *      File directory = new File("");// 参数为空
+         *      String courseFile = directory.getCanonicalPath();
+         * 第三种：  file:/D:/git/daotie/daotie/target/classes/
+         *      URL xmlpath = this.getClass().getClassLoader().getResource("");
+         * 第四种： D:\git\daotie\daotie
+         *      System.out.println(System.getProperty("user.dir"));
+         * 第五种：  获取所有的类路径 包括jar包的路径
+         *      System.out.println(System.getProperty("java.class.path"));
+         * */
     }
 
     @Override
     public void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request) throws Exception {
-        String uri = request.getUri();
-
-        RandomAccessFile file = null;
+        String uri = request.uri();
+        RandomAccessFile file;
         try{
-            String page = uri.equals("/") ? "chat.html" : uri;
+            String page = "/".equals(uri) ? "chat.html" : uri;
+            // mode: r->可读  w-> 可写  rw-> 可读写
             file =	new RandomAccessFile(getResource(page), "r");
 
         }catch(Exception e){
             ctx.fireChannelRead(request.retain());
             return;
         }
-        HttpResponse response = new DefaultHttpResponse(request.getProtocolVersion(), HttpResponseStatus.OK);
+        HttpResponse response = new DefaultHttpResponse(request.protocolVersion(), HttpResponseStatus.OK);
         String contextType = "text/html;";
         if(uri.endsWith(".css")){
             contextType = "text/css;";
@@ -51,24 +71,22 @@ public class HttpHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
             String ext = uri.substring(uri.lastIndexOf("."));
             contextType = "image/" + ext;
         }
-        response.headers().set(HttpHeaders.Names.CONTENT_TYPE, contextType + "charset=utf-8;");
+        response.headers().set("Content-Type", contextType + "charset=utf-8;");
 
-        boolean keepAlive = HttpHeaders.isKeepAlive(request);
+        // 判断是都为长连接
+        boolean keepAlive = HttpUtil.isKeepAlive(request);
 
         if (keepAlive) {
-            response.headers().set(HttpHeaders.Names.CONTENT_LENGTH, file.length());
-            response.headers().set(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
+            response.headers().set("Content-Length", file.length());
+            response.headers().set("Connection", "keep-alive");
         }
         ctx.write(response);
 
         ctx.write(new DefaultFileRegion(file.getChannel(), 0, file.length()));
-//        ctx.write(new ChunkedNioFile(file.getChannel()));
-
         ChannelFuture future = ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);
         if (!keepAlive) {
             future.addListener(ChannelFutureListener.CLOSE);
         }
-
         file.close();
     }
 

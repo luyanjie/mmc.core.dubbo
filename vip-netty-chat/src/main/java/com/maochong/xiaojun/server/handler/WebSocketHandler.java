@@ -19,6 +19,7 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<TextWebSocketF
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx,TextWebSocketFrame msg) throws Exception {
+        // 发送消息
         processor.sendMsg(ctx.channel(), msg.text());
     }
 

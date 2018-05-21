@@ -32,34 +32,39 @@ public class ChatServer {
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         try {
             ServerBootstrap b = new ServerBootstrap();
-            b.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class).option(ChannelOption.SO_BACKLOG, 1024)
+            b.group(bossGroup, workerGroup)
+                    .channel(NioServerSocketChannel.class)
+                    .option(ChannelOption.SO_BACKLOG, 1024)
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         public void initChannel(SocketChannel ch) throws Exception {
 
                             ChannelPipeline pipeline = ch.pipeline();
 
-                            /** 解析自定义协议 */
+                            // 解析自定义协议
                             pipeline.addLast(new IMDecoder());
                             pipeline.addLast(new IMEncoder());
                             pipeline.addLast(new SocketHandler());
 
-                            /** 解析Http请求 */
+                            // 解析Http请求
                             pipeline.addLast(new HttpServerCodec());
                             //主要是将同一个http请求或响应的多个消息对象变成一个 fullHttpRequest完整的消息对象
                             pipeline.addLast(new HttpObjectAggregator(64 * 1024));
                             //主要用于处理大数据流,比如一个1G大小的文件如果你直接传输肯定会撑暴jvm内存的 ,加上这个handler我们就不用考虑这个问题了
                             pipeline.addLast(new ChunkedWriteHandler());
+                            //实现自定义的httpHandler
                             pipeline.addLast(new HttpHandler());
 
-                            /** 解析WebSocket请求 */
+                            // 解析WebSocket请求 带/im 的为WebSocket请求
                             pipeline.addLast(new WebSocketServerProtocolHandler("/im"));
                             pipeline.addLast(new WebSocketHandler());
 
                         }
                     });
+            // 链接服务器
             ChannelFuture f = b.bind(this.port).sync();
             LOG.info("服务已启动,监听端口" + this.port);
+            //服务器同步连接断开时,这句代码才会往下执行
             f.channel().closeFuture().sync();
         } catch (InterruptedException e) {
             e.printStackTrace();
