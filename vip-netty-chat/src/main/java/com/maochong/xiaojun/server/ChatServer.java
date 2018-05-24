@@ -46,8 +46,6 @@ public class ChatServer {
                             pipeline.addLast(new IMDecoder());
                             pipeline.addLast(new IMEncoder());
                             pipeline.addLast(new SocketHandler());
-                            // 文件上传
-                            pipeline.addLast(new FileUploadServerHandler());
 
                             // 解析Http请求
                             pipeline.addLast(new HttpServerCodec());

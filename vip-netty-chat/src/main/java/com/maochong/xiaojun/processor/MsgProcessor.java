@@ -6,11 +6,17 @@ import com.maochong.xiaojun.protocol.IMEncoder;
 import com.maochong.xiaojun.protocol.IMMessage;
 import com.maochong.xiaojun.protocol.IMP;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelId;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.util.AttributeKey;
 import io.netty.util.concurrent.GlobalEventExecutor;
+import io.netty.util.internal.StringUtil;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiConsumer;
 
 /**
  * 主要用于自定义协议内容的逻辑处理
@@ -18,9 +24,15 @@ import io.netty.util.concurrent.GlobalEventExecutor;
  * */
 public class MsgProcessor {
     /**
-     * 记录当前用户数量
+     * 记录当前用户数量(他的原型是Set)
      * */
     private static ChannelGroup onlineUsers = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
+
+    /**
+     * 记录当前用户数量ConcurrentHashMap 来存放，暂时是为了测试点对点发送消息
+     * 这里使用昵称来当做key
+     * */
+    private static Map<String,Channel> currentHashMap = new ConcurrentHashMap<>();
 
     /**
      * 定义扩展属性
@@ -99,13 +111,14 @@ public class MsgProcessor {
         // 给所有用户发送消息
         for (Channel channel : onlineUsers) {
             // 组装消息体
-            IMMessage request = new IMMessage(IMP.SYSTEM.getName(), sysTime(), onlineUsers.size(), getNickName(client) + "离开");
+            IMMessage request = new IMMessage(IMP.SYSTEM.getName(), sysTime(), onlineUsers.size(), "ALL",getNickName(client) + "离开");
             // 编码消息后进行发送给各个通道（用户）
             String content = encoder.encode(request);
             channel.writeAndFlush(new TextWebSocketFrame(content));
         }
         // 最后从列表中删除
         onlineUsers.remove(client);
+        currentHashMap.remove(getNickName(client));
     }
 
     /**
@@ -126,16 +139,39 @@ public class MsgProcessor {
         // 解码消息后把消息内容转为实体类
         IMMessage request = decoder.decode(msg);
         if(null == request){ return; }
+
         // 获取IP地址
         String addr = getAddress(client);
+        String receiver = request.getReceiver();
+        // 判断是否发给单个人
+        if(!StringUtil.isNullOrEmpty(receiver) && !"all".equals(receiver.toLowerCase())){
+            sendMsg(client,receiver,msg);
+            return;
+        }
+
         // 消息类型是登陆 LOGIN
         if(IMP.LOGIN.getName().equals(request.getCmd())){
             client.attr(NICK_NAME).getAndSet(request.getSender());
             client.attr(IP_ADDR).getAndSet(addr);
             onlineUsers.add(client);
+            currentHashMap.put(request.getSender(),client);
+
+            /*currentHashMap.forEach((k,v)->{
+                String content = encoder.encode(new IMMessage(IMP.SYSTEM.getName(), sysTime(), onlineUsers.size(),receiver, v != client
+                        ? getNickName(client) + "加入"
+                        : "已与服务器建立连接！"));
+                v.writeAndFlush(new TextWebSocketFrame(content));
+            });
+
+            for (Map.Entry<String,Channel> entry:currentHashMap.entrySet()) {
+                Channel channel = entry.getValue();
+            }
+            */
+
+
 
             for (Channel channel : onlineUsers) {
-                request = new IMMessage(IMP.SYSTEM.getName(), sysTime(), onlineUsers.size(), channel != client
+                request = new IMMessage(IMP.SYSTEM.getName(), sysTime(), onlineUsers.size(),receiver, channel != client
                         ? getNickName(client) + "加入"
                         : "已与服务器建立连接！");
                 String content = encoder.encode(request);
@@ -189,10 +225,113 @@ public class MsgProcessor {
     }
 
     /**
+     * 点对点发送消息
+     * @param client 消息发送者
+     * @param receiveName 消息接受者
+     * @param msg 消息内容
+     * */
+    public void sendMsg(Channel client, String receiveName, String msg)
+    {
+        System.out.println("sendMsg");
+        System.out.println(msg);
+
+        // 解码消息后把消息内容转为实体类
+        IMMessage request = decoder.decode(msg);
+        System.out.println(request.toString());
+        if(null == request){ return; }
+        // 获取IP地址
+        // String addr = getAddress(client);
+
+        // 判断要发送的通道是否存在
+        Channel receive = currentHashMap.get(receiveName);
+        if(receive == null){
+            System.out.println("要发送的通道不存在");
+            return;
+        }
+
+        // 消息类型是发送消息 CHAT
+        if(IMP.CHAT.getName().equals(request.getCmd())){
+
+            // 判断是发送给自己的
+            send(client,request,"you","");
+            // 发送给对方
+            send(receive,request,getNickName(client),"");
+//            request.setSender("you");
+//            request.setTime(sysTime());
+//            String content = encoder.encode(request);
+//            client.writeAndFlush(new TextWebSocketFrame(content));
+//
+//            request.setSender(getNickName(client));
+//            request.setTime(sysTime());
+//            content = encoder.encode(request);
+//            receive.writeAndFlush(new TextWebSocketFrame(content));
+        }
+
+        // 消息类型是送鲜花 FLOWER
+        else if(IMP.FLOWER.getName().equals(request.getCmd())){
+            long currTime = sysTime();
+            if(noAllowFlower(client,request,currTime)){
+                return;
+            }
+
+            // 给自己发送鲜花
+            setAttrs(client, "lastFlowerTime", currTime);
+            send(receive,request,"you","你给大家送了一波鲜花雨");
+
+            // 给对方发送鲜花
+            send(receive,request,getNickName(client),getNickName(client) + "送来一波鲜花雨");
+        }
+    }
+
+    /**
+     * 发送消息
+     * @param client 接受者的通道
+     * @param request request
+     * @param sender 发送者
+     * @param title 说明内容
+     * */
+    private void send(Channel client,IMMessage request,String sender,String title)
+    {
+        request.setSender(sender);
+        if(!StringUtil.isNullOrEmpty(title))
+        {request.setContent(title);}
+        request.setTime(sysTime());
+        String content = encoder.encode(request);
+        client.writeAndFlush(new TextWebSocketFrame(content));
+    }
+
+    /**
+     * 该客户端是否允许给对方发送鲜花
+     * */
+    private boolean noAllowFlower(Channel client,IMMessage request,long currTime)
+    {
+        JSONObject attrs = getAttrs(client);
+
+        if(null != attrs){
+            long lastTime = attrs.getLongValue("lastFlowerTime");
+            // 10秒之内不允许重复刷鲜花
+            int seconds = 10;
+            long sub = currTime - lastTime;
+            if(sub < 1000 * seconds){
+                request.setSender("you");
+                request.setCmd(IMP.SYSTEM.getName());
+                request.setContent("您送鲜花太频繁," + (seconds - Math.round(sub / 1000)) + "秒后再试");
+                String content = encoder.encode(request);
+                client.writeAndFlush(new TextWebSocketFrame(content));
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+
+    /**
      * 获取系统时间
      * @return 系统时间
      */
     private Long sysTime(){
         return System.currentTimeMillis();
     }
+
  }

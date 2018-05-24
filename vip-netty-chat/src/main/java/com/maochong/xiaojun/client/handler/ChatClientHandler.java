@@ -29,9 +29,9 @@ public class ChatClientHandler extends ChannelInboundHandlerAdapter {
                     if(scanner.hasNext()){
                         String input = scanner.nextLine();
                         if("exit".equals(input)){
-                            message = new IMMessage(IMP.LOGOUT.getName(),System.currentTimeMillis(),nickName);
+                            message = new IMMessage(IMP.LOGOUT.getName(),System.currentTimeMillis(),nickName,"ALL");
                         }else{
-                            message = new IMMessage(IMP.CHAT.getName(),System.currentTimeMillis(),nickName,input);
+                            message = new IMMessage(IMP.CHAT.getName(),System.currentTimeMillis(),nickName,"ALL",input);
                         }
                     }
                 }
@@ -47,7 +47,7 @@ public class ChatClientHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         this.ctx = ctx;
-        IMMessage message = new IMMessage(IMP.LOGIN.getName(),System.currentTimeMillis(),this.nickName);
+        IMMessage message = new IMMessage(IMP.LOGIN.getName(),System.currentTimeMillis(),this.nickName,"ALL");
         sendMsg(message);
         LOG.info("成功连接服务器,已执行登录动作");
         session();

@@ -51,21 +51,25 @@ public class IMMessage {
 
     public IMMessage(){}
 
-    public IMMessage(String cmd,long time,int online,String content){
+    public IMMessage(String cmd,long time,int online,String receiver, String content){
         this.cmd = cmd;
         this.time = time;
         this.online = online;
+        this.receiver = receiver;
         this.content = content;
+
     }
-    public IMMessage(String cmd,long time,String sender){
+    public IMMessage(String cmd,long time,String sender,String receiver){
         this.cmd = cmd;
         this.time = time;
         this.sender = sender;
+        this.receiver = receiver;
     }
-    public IMMessage(String cmd,long time,String sender,String content){
+    public IMMessage(String cmd,long time,String sender,String receiver,String content){
         this.cmd = cmd;
         this.time = time;
         this.sender = sender;
+        this.receiver = receiver;
         this.content = content;
     }
 }

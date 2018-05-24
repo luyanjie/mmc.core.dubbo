@@ -55,12 +55,17 @@ public class HttpHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
         String uri = request.uri();
         RandomAccessFile file;
         try{
+            if(uri.contains("?")){
+                uri = uri.substring(0,uri.lastIndexOf("?"));
+            }
+            System.out.println("uri:"+uri);
             String page = "/".equals(uri) ? "chat.html" : uri;
+
             // mode: r->可读  w-> 可写  rw-> 可读写
             file =	new RandomAccessFile(getResource(page), "r");
 
         }catch(Exception e){
-            ctx.fireChannelRead(request.retain());
+            ctx.fireChannelRead(request.retain());/**/
             return;
         }
         HttpResponse response = new DefaultHttpResponse(request.protocolVersion(), HttpResponseStatus.OK);

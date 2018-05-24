@@ -31,6 +31,7 @@ public class IMEncoder extends MessageToByteEncoder<IMMessage> {
         if(!(null == msg.getContent() || "".equals(msg.getContent()))){
             prex += (" - " + msg.getContent());
         }
+
         return prex;
     }
 }
