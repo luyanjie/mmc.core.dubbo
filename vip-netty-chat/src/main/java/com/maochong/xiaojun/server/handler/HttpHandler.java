@@ -1,5 +1,7 @@
 package com.maochong.xiaojun.server.handler;
 
+import com.maochong.xiaojun.protocol.EnumContextType;
+import com.maochong.xiaojun.protocol.EnumUrlType;
 import io.netty.channel.*;
 import io.netty.handler.codec.http.*;
 import org.apache.log4j.Logger;
@@ -62,14 +64,15 @@ public class HttpHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
             return;
         }
         HttpResponse response = new DefaultHttpResponse(request.protocolVersion(), HttpResponseStatus.OK);
-        String contextType = "text/html;";
-        if(uri.endsWith(".css")){
-            contextType = "text/css;";
-        }else if(uri.endsWith(".js")){
-            contextType = "text/javascript;";
-        }else if(uri.toLowerCase().matches("(jpg|png|gif)$")){
+        //"text/html;";
+        String contextType = EnumContextType.HTML.getNmae();
+        if(uri.endsWith(EnumUrlType.CSS.getName())){
+            contextType = EnumContextType.CSS.getNmae();
+        }else if(uri.endsWith(EnumUrlType.JS.getName())){
+            contextType = EnumContextType.JAVASCRIPT.getNmae();
+        }else if(uri.toLowerCase().matches(EnumUrlType.IMAGE.getName())){
             String ext = uri.substring(uri.lastIndexOf("."));
-            contextType = "image/" + ext;
+            contextType = EnumContextType.IMAGE.getNmae() + ext;
         }
         response.headers().set("Content-Type", contextType + "charset=utf-8;");
 

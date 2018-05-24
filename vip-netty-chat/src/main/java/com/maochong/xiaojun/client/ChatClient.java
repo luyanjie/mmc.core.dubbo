@@ -52,6 +52,6 @@ public class ChatClient {
 
 
     public static void main(String[] args) throws IOException {
-        new ChatClient("Sam").connect("127.0.0.1",80);
+        new ChatClient("Sam").connect("127.0.0.1",8011);
     }
 }
