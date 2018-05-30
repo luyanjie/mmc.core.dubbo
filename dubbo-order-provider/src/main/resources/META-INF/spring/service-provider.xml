@@ -15,7 +15,8 @@
     <!--添加监控-->
     <dubbo:monitor protocol="registry"></dubbo:monitor>
 
-    <!--dubbo这个服务所要暴露的服务地址所对应的注册中心 集群写法：zookeeper://192.168.40.155:2181?backup=192.168.40.156:2181,192.168.40.157:2181-->
+    <!--dubbo这个服务所要暴露的服务地址所对应的注册中心 集群写法：zookeeper://192.168.40.155:2181?backup=192.168.40.156:2181,192.168.40.157:2181   username="root" password="root" 可以设置密码-->
+    <!--<dubbo:registry address="${dubbo.registry.address}" group="${dubbo.registry.group}" file="${dubbo.registry.file}" username="root" password="root"></dubbo:registry>-->
     <dubbo:registry address="${dubbo.registry.address}" group="${dubbo.registry.group}" file="${dubbo.registry.file}"></dubbo:registry>
 
     <!--当前服务发布所依赖的协议；webserovice、Thrift、Hessain、http-->
