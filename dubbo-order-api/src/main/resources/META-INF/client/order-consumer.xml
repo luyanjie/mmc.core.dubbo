@@ -12,7 +12,8 @@
 
     <context:annotation-config/>
 
-    <dubbo:reference id="orderServices" interface="com.maochong.xiaojun.orderapi.IOrderServices" check="true" version="1.0.0" retries="2" cluster="failover"/>
+    <!--什么需要暴露的服务接口-->
+    <dubbo:reference id="orderServices" interface="com.maochong.xiaojun.orderapi.IOrderServices" check="true" version="1.0.0" retries="2" cluster="failover" mock="com.maochong.xiaojun.orderapi.OrderMock"/>
 
     <dubbo:reference id="orderQueryServices" interface="com.maochong.xiaojun.orderapi.IOrderServices" check="false" version="2.0.0"/>
 
