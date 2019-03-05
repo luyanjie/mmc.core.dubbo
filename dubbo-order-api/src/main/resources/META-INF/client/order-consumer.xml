@@ -18,7 +18,7 @@
     <dubbo:reference id="orderQueryServices" interface="com.maochong.xiaojun.orderapi.IOrderServices" check="false" version="2.0.0"/>
 
     <!--生成一个远程服务的调用代理 异步处理 async=true-->
-    <dubbo:reference id="orderAsyncServices" interface="com.maochong.xiaojun.orderapi.IOrderServices" check="false" version="2.2.0" >
+    <dubbo:reference id="orderAsyncServices" interface="com.maochong.xiaojun.orderapi.IOrderServices" check="false" version="2.2.0" loadbalance="random" retries="2" >
         <dubbo:method name="doOrder" async="true"></dubbo:method>
     </dubbo:reference>
 
