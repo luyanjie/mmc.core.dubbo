@@ -58,7 +58,7 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<TextWebSocketF
         String addr = processor.getAddress(client);
         LOG.info("WebSocket Client:" + addr + "异常");
         // 当出现异常就关闭连接
-        cause.printStackTrace();
+        //cause.printStackTrace();
         ctx.close();
     }
 

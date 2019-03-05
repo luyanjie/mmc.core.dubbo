@@ -2,7 +2,6 @@ package com.maochong.xiaojun.server;
 
 import com.maochong.xiaojun.protocol.IMDecoder;
 import com.maochong.xiaojun.protocol.IMEncoder;
-import com.maochong.xiaojun.server.handler.FileUploadServerHandler;
 import com.maochong.xiaojun.server.handler.HttpHandler;
 import com.maochong.xiaojun.server.handler.SocketHandler;
 import com.maochong.xiaojun.server.handler.WebSocketHandler;
@@ -23,8 +22,8 @@ import java.io.IOException;
  * 聊天工具服务端
  * @author jokinF
  * */
-public class ChatServer {
-    private static Logger LOG = Logger.getLogger(ChatServer.class);
+public class NettyServer {
+    private static Logger LOG = Logger.getLogger(NettyServer.class);
 
     private int port = 8011;
 
@@ -78,6 +77,6 @@ public class ChatServer {
 
 
     public static void main(String[] args) throws IOException{
-        new ChatServer().start();
+        new NettyServer().start();
     }
 }

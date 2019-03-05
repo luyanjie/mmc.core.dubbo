@@ -14,12 +14,12 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 
 import java.io.IOException;
 
-public class ChatClient {
+public class NettyClient {
     private ChatClientHandler clientHandler;
     private String host;
     private int port;
 
-    public ChatClient(String nickName){
+    public NettyClient(String nickName){
         this.clientHandler = new ChatClientHandler(nickName);
     }
 
@@ -58,6 +58,6 @@ public class ChatClient {
         }
     }
     public static void main(String[] args) throws IOException {
-        new ChatClient("Sam").connect("127.0.0.1",8011);
+        new NettyClient("Sam").connect("127.0.0.1",8011);
     }
 }

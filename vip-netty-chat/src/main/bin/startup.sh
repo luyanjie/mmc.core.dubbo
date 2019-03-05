@@ -11,7 +11,7 @@ APP_NAME=service
 SERVICE_DIR=/data/wwwroot/netty/$APP_NAME
 SERVICE_NAME=vip-netty-chat
 
-MAIN_CLASS="com.maochong.xiaojun.server.ChatServer"
+MAIN_CLASS="com.maochong.xiaojun.server.NettyServer"
 PATH="classes"
 
 process_Id=`/usr/sbin/lsof -i tcp:8011|/usr/bin/awk '{print $2}'|/usr/bin/sed '/PID/d'`

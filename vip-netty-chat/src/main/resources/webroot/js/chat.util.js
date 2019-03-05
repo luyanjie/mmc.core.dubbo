@@ -79,7 +79,8 @@ $(document).ready(function(){
 
 				// var value = getQueryString("receiver");
 
-		    	var msg = ("[CHAT][" + new Date().getTime() + "]" + "[" + CHAT.nickname + "][222] - " + message.html().replace(/\n/ig,"<br/>"));
+		    	//var msg = ("[CHAT][" + new Date().getTime() + "]" + "[" + CHAT.nickname + "][222] - " + message.html().replace(/\n/ig,"<br/>"));
+				var msg = ("[CHAT][" + new Date().getTime() + "]" + "[" + CHAT.nickname + "][ALL] - " + message.html().replace(/\n/ig,"<br/>"));
 		    	CHAT.socket.send(msg);
 		    	message.empty();
 		    	message.focus();

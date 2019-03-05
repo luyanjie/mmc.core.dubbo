@@ -24,13 +24,12 @@ public class FileUploadServer {
 
     private int port = 8012;
 
-    public void start()
-    {
-        EventLoopGroup bossGrop = new NioEventLoopGroup();
-        EventLoopGroup workGrop = new NioEventLoopGroup();
+    public void start() {
+        EventLoopGroup bossGroup = new NioEventLoopGroup();
+        EventLoopGroup workGroup = new NioEventLoopGroup();
         try {
             ServerBootstrap b = new ServerBootstrap();
-            b.group(bossGrop,workGrop)
+            b.group(bossGroup, workGroup)
                     .channel(NioServerSocketChannel.class)
                     .option(ChannelOption.SO_BACKLOG, 1024)
                     .childHandler(new ChannelInitializer<SocketChannel>() {
@@ -43,13 +42,15 @@ public class FileUploadServer {
                             pipeline.addLast(new FileUploadServerHandler());
                         }
                     });
-           ChannelFuture f = b.bind(this.port).sync();
+            ChannelFuture f = b.bind(this.port).sync();
             LOG.info("服务已启动,监听端口" + this.port);
-           f.channel().closeFuture().sync();
-        }
-        catch (Exception ex)
-        {
+            f.channel().closeFuture().sync();
+        } catch (Exception ex) {
             ex.printStackTrace();
+        }
+        finally {
+            bossGroup.shutdownGracefully();
+            workGroup.shutdownGracefully();
         }
 
     }

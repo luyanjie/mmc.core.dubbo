@@ -70,7 +70,7 @@
                     <archive>
                         <manifest>
                             <!--执行Jar文件的启动类,使用dubbo自带的启动类 -->
-                            <mainClass>com.maochong.xiaojun.server.ChatServer</mainClass>
+                            <mainClass>com.maochong.xiaojun.server.NettyServer</mainClass>
                             <!-- 打包时 MANIFEST.MF文件不记录的时间戳版本 -->
                             <useUniqueVersions>false</useUniqueVersions>
                             <addClasspath>true</addClasspath>

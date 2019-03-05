@@ -104,7 +104,7 @@ public class HttpHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
         Channel client = ctx.channel();
         LOG.info("Client:"+client.remoteAddress()+"异常");
         // 当出现异常就关闭连接
-        cause.printStackTrace();
+        // cause.printStackTrace();
         ctx.close();
     }
 }
