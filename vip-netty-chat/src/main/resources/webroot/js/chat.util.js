@@ -21,6 +21,13 @@ Date.prototype.format = function(format){
 	return format; 
 };
 
+function getQueryString(name) {
+    var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+    var r = window.location.search.substr(1).match(reg);
+    if (r != null) return unescape(r[2]);
+    return "ALL";
+}
+
 $(document).ready(function(){
 	var host = location.href.replace(/http:\/\//i,"");
 	window.CHAT = {
@@ -69,7 +76,11 @@ $(document).ready(function(){
 			if(message.html().replace(/\s/ig,"") == ""){ return; }
 		    if (!window.WebSocket) { return; }
 		    if (CHAT.socket.readyState == WebSocket.OPEN) {
-		    	var msg = ("[CHAT][" + new Date().getTime() + "]" + "[" + CHAT.nickname + "] - " + message.html().replace(/\n/ig,"<br/>"));
+
+				// var value = getQueryString("receiver");
+
+		    	//var msg = ("[CHAT][" + new Date().getTime() + "]" + "[" + CHAT.nickname + "][222] - " + message.html().replace(/\n/ig,"<br/>"));
+				var msg = ("[CHAT][" + new Date().getTime() + "]" + "[" + CHAT.nickname + "][ALL] - " + message.html().replace(/\n/ig,"<br/>"));
 		    	CHAT.socket.send(msg);
 		    	message.empty();
 		    	message.focus();

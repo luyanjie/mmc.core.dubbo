@@ -19,6 +19,7 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<TextWebSocketF
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx,TextWebSocketFrame msg) throws Exception {
+        // 发送消息
         processor.sendMsg(ctx.channel(), msg.text());
     }
 
@@ -57,7 +58,7 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<TextWebSocketF
         String addr = processor.getAddress(client);
         LOG.info("WebSocket Client:" + addr + "异常");
         // 当出现异常就关闭连接
-        cause.printStackTrace();
+        //cause.printStackTrace();
         ctx.close();
     }
 

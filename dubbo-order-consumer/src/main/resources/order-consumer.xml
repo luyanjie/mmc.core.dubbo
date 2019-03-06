@@ -8,30 +8,30 @@
     <dubbo:application name="order-provider" owner="jokin"/>
 
     <!--dubbo这个服务所要暴露的服务地址所对应的注册中心 集群配置：zookeeper://192.168.11.129:2181?backup=192.168.11.137:2181,192.168.11.138:2181,192.168.11.139:2181-->
-    <dubbo:registry address="zookeeper://192.168.40.155:2181" group="dubbo-dev" file="d:/dubbo.order.cache"/>
+    <dubbo:registry address="zookeeper://192.168.40.155:2181" group="dubbo-dev" file="d:/dubbo.order.cache" />
 
     <!--具体的api信息配置在api项目下-->
     <import resource="classpath*:META-INF/client/order-consumer.xml"/>
     <!--配置到api中-->
-    <!--&lt;!&ndash;生成一个远程服务的调用代理 check="true" 启动是检查服务 多版本支持-->
-    <!--retries:当服务调用失败后重试次数，默认是2-->
-    <!--cluster：集群容错方式，默认是failover，服务调用失败后自动重试其他服务器，配合retries使用-->
-    <!--&ndash;&gt;-->
-    <!--<dubbo:reference id="orderServices" interface="com.maochong.xiaojun.orderapi.IOrderServices" check="true" version="1.0.0" retries="2" cluster="failover"/>-->
+    <!--生成一个远程服务的调用代理 check="true" 启动是检查服务 多版本支持
+    retries:当服务调用失败后重试次数，默认是2
+    cluster：集群容错方式，默认是failover，服务调用失败后自动重试其他服务器，配合retries使用
+    -->
+   <!-- <dubbo:reference id="orderServices" interface="com.maochong.xiaojun.orderapi.IOrderServices" check="true" version="1.0.0" retries="2" cluster="failover"/>
 
-    <!--<dubbo:reference id="orderQueryServices" interface="com.maochong.xiaojun.orderapi.IOrderServices" check="false" version="2.0.0"/>-->
+    <dubbo:reference id="orderQueryServices" interface="com.maochong.xiaojun.orderapi.IOrderServices" check="false" version="2.0.0"/>
 
-    <!--&lt;!&ndash;生成一个远程服务的调用代理 异步处理 async=true&ndash;&gt;-->
-    <!--<dubbo:reference id="orderAsyncServices" interface="com.maochong.xiaojun.orderapi.IOrderServices" check="false" version="2.2.0" >-->
-        <!--<dubbo:method name="doOrder" async="true"></dubbo:method>-->
-        <!--&lt;!&ndash;sent="true" 等待消息发出，消息发送失败将抛出异常。-->
-            <!--sent="false" 不等待消息发出，将消息放入 IO 队列，即刻返回。-->
-            <!--如果你只是想异步，完全忽略返回值，可以配置 return="false"，以减少 Future 对象的创建和管理成本：-->
-        <!--&ndash;&gt;-->
-        <!--&lt;!&ndash;<dubbo:method name="doOrder" async="true" sent="true" return="false"></dubbo:method>&ndash;&gt;-->
-    <!--</dubbo:reference>-->
-    <!--&lt;!&ndash;配置dubbo集群负载均衡算法，有四种random、roundrobin、leastactive、consistenthash&ndash;&gt;-->
-    <!--&lt;!&ndash;<dubbo:reference interface="com.maochong.xiaojun.orderapi.IOrderServices" loadbalance="roundrobin"></dubbo:reference>&ndash;&gt;-->
+    &lt;!&ndash;生成一个远程服务的调用代理 异步处理 async=true&ndash;&gt;
+    <dubbo:reference id="orderAsyncServices" interface="com.maochong.xiaojun.orderapi.IOrderServices" check="false" version="2.2.0" >
+        <dubbo:method name="doOrder" async="true"></dubbo:method>
+        &lt;!&ndash;sent="true" 等待消息发出，消息发送失败将抛出异常。
+            sent="false" 不等待消息发出，将消息放入 IO 队列，即刻返回。
+            如果你只是想异步，完全忽略返回值，可以配置 return="false"，以减少 Future 对象的创建和管理成本：
+        &ndash;&gt;
+        &lt;!&ndash;<dubbo:method name="doOrder" async="true" sent="true" return="false"></dubbo:method>&ndash;&gt;
+    </dubbo:reference>
+    &lt;!&ndash;配置dubbo集群负载均衡算法，有四种random、roundrobin、leastactive、consistenthash&ndash;&gt;
+    &lt;!&ndash;<dubbo:reference interface="com.maochong.xiaojun.orderapi.IOrderServices" loadbalance="roundrobin"></dubbo:reference>&ndash;&gt;
 
-    <!--<dubbo:consumer timeout="5000"></dubbo:consumer>-->
+    <dubbo:consumer timeout="5000"></dubbo:consumer>-->
 </beans>

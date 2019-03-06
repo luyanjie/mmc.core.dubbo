@@ -59,7 +59,8 @@ public class NIOServer {
             if(wait == 0) {continue;} //如果没有人排队，进入下一次轮询
 
             //取号，默认给他分配个号码（排队号码）
-            Set<SelectionKey> keys = selector.selectedKeys();  //可以通过这个方法，知道可用通道的集合
+            //可以通过这个方法，知道可用通道的集合
+            Set<SelectionKey> keys = selector.selectedKeys();
             Iterator<SelectionKey> iterator = keys.iterator();
             while(iterator.hasNext()) {
                 SelectionKey key = iterator.next();

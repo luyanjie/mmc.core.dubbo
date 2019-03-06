@@ -30,7 +30,7 @@ public class IMDecoder extends ByteToMessageDecoder {
             String content = new String(array,in.readerIndex(),length);
 
             //空消息不解析
-            if(!(null == content || "".equals(content.trim()))){
+            if(!"".equals(content.trim())){
                 if(!IMP.isIMP(content)){
                     ctx.channel().pipeline().remove(this);
                     return;
@@ -60,20 +60,25 @@ public class IMDecoder extends ByteToMessageDecoder {
                 header = m.group(1);
                 content = m.group(3);
             }
-
             String [] heards = header.split("\\]\\[");
             long time = 0;
             try{ time = Long.parseLong(heards[1]); } catch(Exception e){}
             String nickName = heards[2];
+            // 接受者默认是所有人
+            String receiver = "ALL";
+            if(heards.length > 3)
+            {
+                receiver = heards[3];
+            }
             //昵称最多十个字
             nickName = nickName.length() < 10 ? nickName : nickName.substring(0, 9);
 
             if(msg.startsWith("[" + IMP.LOGIN.getName() + "]")){
-                return new IMMessage(heards[0],time,nickName);
+                return new IMMessage(heards[0],time,nickName,receiver);
             }else if(msg.startsWith("[" + IMP.CHAT.getName() + "]")){
-                return new IMMessage(heards[0],time,nickName,content);
+                return new IMMessage(heards[0],time,nickName,receiver,content);
             }else if(msg.startsWith("[" + IMP.FLOWER.getName() + "]")){
-                return new IMMessage(heards[0],time,nickName);
+                return new IMMessage(heards[0],time,nickName,receiver);
             }else{
                 return null;
             }

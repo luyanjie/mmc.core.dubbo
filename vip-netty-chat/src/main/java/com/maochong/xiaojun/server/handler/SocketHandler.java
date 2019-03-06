@@ -19,6 +19,7 @@ public class SocketHandler extends SimpleChannelInboundHandler<IMMessage>{
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, IMMessage msg) throws Exception {
+        // 发送消息
         processor.sendMsg(ctx.channel(), msg);
     }
 
@@ -32,12 +33,12 @@ public class SocketHandler extends SimpleChannelInboundHandler<IMMessage>{
     public void handlerRemoved(ChannelHandlerContext ctx) throws Exception { // (3)
         Channel client = ctx.channel();
         processor.logout(client);
-        LOG.info("Socket Client:" + processor.getNickName(client) + "离开");
+        // LOG.info("Socket Client:" + processor.getNickName(client) + "离开");
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        LOG.info("channelInactive");
+        // LOG.info("channelInactive");
         super.channelInactive(ctx);
     }
     /**
@@ -45,9 +46,9 @@ public class SocketHandler extends SimpleChannelInboundHandler<IMMessage>{
      */
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        LOG.info("Socket Client: 有客户端连接："+ processor.getAddress(ctx.channel()));
+        // LOG.info("Socket Client: 有客户端连接："+ processor.getAddress(ctx.channel()));
+        // 有用户连上，可以写入数据库了
     }
-
 
     /**
      * 异常处理
