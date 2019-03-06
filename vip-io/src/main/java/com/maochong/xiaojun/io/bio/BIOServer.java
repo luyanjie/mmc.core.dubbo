@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * BIO（同步阻塞）服务端
  * @author jokin
- * @data 2018-05-12
+ * @date 2018-05-12
  * */
 public class BIOServer {
     ServerSocket server;
